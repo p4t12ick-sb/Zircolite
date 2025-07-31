@@ -820,23 +820,20 @@ class evtxExtractor:
 
     def Logs2JSON(self, func, datasource, outfile, isFile=True):
         """
-        Use multiprocessing to convert supported log formats to JSON
+        Convert supported log formats to JSON without using multiprocessing
         """
-        
+
         if isFile:
-            with open(datasource, "r", encoding=self.encoding) as fp: 
+            with open(datasource, "r", encoding=self.encoding) as fp:
                 data = fp.readlines()
-        else : 
+        else:
             data = datasource.split("\n")
-        
-        pool = mp.Pool(self.cores)
-        result = pool.map(func, data)
-        pool.close()
-        pool.join()
+
+        result = [func(line) for line in data]
         with open(outfile, "w", encoding="UTF-8") as fp:
             for element in result:
                 if element is not None:
-                    fp.write(json.dumps(element).decode("utf-8") + '\n')
+                    fp.write(json.dumps(element).decode("utf-8") + "\n")
 
     def csv2JSON(self, CSVPath, JSONPath):  
         """
